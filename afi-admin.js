@@ -35,7 +35,7 @@ jQuery( function( $ ) {
      * Link update Amazon
      */
 
-    const limit_link_update = 2;
+    const limit_link_update = 50;
     var new_update = 0;
     var number_success = 0;
     var is_form_update_offset = false;
