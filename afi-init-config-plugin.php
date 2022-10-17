@@ -303,7 +303,7 @@ function update_post_without_update_like($id_post = null){
     $afi_change_urls = get_option('afi_change_urls', array());
 
     if(!empty($id_post)){
-        $sql_posts_without_update_like = "SELECT ID, post_content FROM `wpwe_posts` WHERE ID = $id_post";
+        $sql_posts_without_update_like = "SELECT ID, post_content FROM `{$wpdb->prefix}posts` WHERE ID = $id_post";
 
         $get_posts_without_update_like = $wpdb->get_results($sql_posts_without_update_like);
     }else{
@@ -321,7 +321,7 @@ function update_post_without_update_like($id_post = null){
         }
         
         // get post without update like
-        $sql_posts_without_update_like = "SELECT ID, post_content FROM `wpwe_posts` WHERE ($where_search) AND `post_status` LIKE 'publish' LIMIT $limit OFFSET $offset";
+        $sql_posts_without_update_like = "SELECT ID, post_content FROM `{$wpdb->prefix}posts` WHERE ($where_search) AND `post_status` LIKE 'publish' LIMIT $limit OFFSET $offset";
 
         $get_posts_without_update_like = $wpdb->get_results($sql_posts_without_update_like);
     }
@@ -377,10 +377,11 @@ function update_post_without_update_like($id_post = null){
             
         }
 
-        // update new data
-        $wpdb->query(
-            $wpdb->prepare("UPDATE {$wpdb->posts} SET post_content = '%s' WHERE id = %d", [$new_content, $get_post_without_update_like->ID])
+        $update_post = array(
+            'ID' => $get_post_without_update_like->ID,
+            'post_content' => wp_kses_post($new_content),
         );
+        wp_update_post($update_post, true);
 
     }   
 	
