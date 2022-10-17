@@ -326,8 +326,9 @@ function update_post_without_update_like($id_post = null){
         $get_posts_without_update_like = $wpdb->get_results($sql_posts_without_update_like);
     }
 
-    foreach ($get_posts_without_update_like as $get_post_without_update_like) {
 
+
+    foreach ($get_posts_without_update_like as $get_post_without_update_like) {
         // get data post
         $new_content = $get_post_without_update_like->post_content;
 
@@ -441,16 +442,16 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
 
     // change tag/id afiliate
 
-
-
     if(!empty($parse_url_amazon['query'])){
-        parse_str($parse_url_amazon['query'], $parameter_url_amazon);
+        parse_str(html_entity_decode($parse_url_amazon['query']), $parameter_url_amazon);
     }
     $parameter_url_amazon['tag'] = $afi_amazon_id;
 
     if(!empty($parameter_url_amazon['keywords'])){
+
         $search_amazon = $parameter_url_amazon['keywords'];
     }else if( 
+
         preg_match( 
             '/^(https:\/\/|http:\/\/)(www\.)?amazon\.(.[^\/]*?)\/(.[^\/]*)\/dp[\/|?]/', 
             $old_link_amazon, 
@@ -470,6 +471,7 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
     ){
 
         if(!empty($search_amazon)){
+
             $parameter_resplase_amazon = array(
                 'k' => $search_amazon,
                 'tag' => $afi_amazon_id
