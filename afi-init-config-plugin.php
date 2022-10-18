@@ -305,6 +305,8 @@ function update_post_without_update_like($id_post = null){
     if(!empty($id_post)){
         $sql_posts_without_update_like = "SELECT ID, post_content FROM `{$wpdb->prefix}posts` WHERE ID = $id_post";
 
+
+
         $get_posts_without_update_like = $wpdb->get_results($sql_posts_without_update_like);
     }else{
         $offset = absint($_POST['offset']);
@@ -323,6 +325,8 @@ function update_post_without_update_like($id_post = null){
         // get post without update like
         $sql_posts_without_update_like = "SELECT ID, post_content FROM `{$wpdb->prefix}posts` WHERE ($where_search) AND `post_status` LIKE 'publish' LIMIT $limit OFFSET $offset";
 
+        write_log('$sql_posts_without_update_like');
+        write_log($sql_posts_without_update_like);
         $get_posts_without_update_like = $wpdb->get_results($sql_posts_without_update_like);
     }
 
