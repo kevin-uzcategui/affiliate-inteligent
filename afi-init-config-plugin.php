@@ -328,6 +328,10 @@ function update_post_without_update_like($id_post = null){
         write_log('$sql_posts_without_update_like');
         write_log($sql_posts_without_update_like);
         $get_posts_without_update_like = $wpdb->get_results($sql_posts_without_update_like);
+
+        write_log('$get_posts_without_update_like');
+        write_log($get_posts_without_update_like);
+
     }
 
 
@@ -386,6 +390,11 @@ function update_post_without_update_like($id_post = null){
             'ID' => $get_post_without_update_like->ID,
             'post_content' => wp_kses_post($new_content),
         );
+
+
+        write_log('$update_post');
+        write_log($update_post);
+
         wp_update_post($update_post, true);
 
     }   
