@@ -12,7 +12,7 @@ Text Domain:  afi
 Domain Path:  /languages
 */
 
-define("VERSION_AFFILIATE_INTELIGENT", "1.0.0");
+define("VERSION_AFFILIATE_INTELIGENT", "1.0.1");
 
 /* Add enqueue */
 function ai_enqueue() {
@@ -374,6 +374,9 @@ function update_post_without_update_like($id_post = null){
                 $change_url_other
             );
 
+            write_log('$change_url_other');
+            write_log($change_url_other);
+
             foreach ($change_url_other[2] as $key_link_content => $link_content) {
             
                 $new_content = ger_content_with_updata_url(
@@ -385,6 +388,10 @@ function update_post_without_update_like($id_post = null){
             }            
             
         }
+        write_log('$get_post_without_update_like->ID');
+        write_log($get_post_without_update_like->ID);
+        write_log('$new_content');
+        write_log($new_content);
 
         $update_post = array(
             'ID' => $get_post_without_update_like->ID,
@@ -392,8 +399,7 @@ function update_post_without_update_like($id_post = null){
         );
 
 
-        write_log('$update_post');
-        write_log($update_post);
+
 
         wp_update_post($update_post, true);
 
@@ -425,7 +431,8 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
     }else{
         $url_resplase_amazon = 'https://www.amazon.com';
     }
-    
+    write_log('$entro 1');
+
     if($is_redirect){
         $curl = curl_init();
 
@@ -452,6 +459,7 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
     }
 
     $parse_url_amazon = parse_url($old_link_amazon);
+    write_log('$entro 2');
 
     // change tag/id afiliate
 
@@ -463,8 +471,7 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
     if(!empty($parameter_url_amazon['keywords'])){
 
         $search_amazon = $parameter_url_amazon['keywords'];
-    }else if( 
-
+    }else if(
         preg_match( 
             '/^(https:\/\/|http:\/\/)(www\.)?amazon\.(.[^\/]*?)\/(.[^\/]*)\/dp[\/|?]/', 
             $old_link_amazon, 
@@ -475,6 +482,9 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
         $search_amazon = str_replace('-', ' ', $path_amazon_title[4]);
 
     }
+
+    write_log('$entro 3');
+
 
     if(   
         preg_match ( 
@@ -513,6 +523,7 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
             $new_content = str_replace($old_link_content, $parse_url_amazon['scheme'] . "://" . $parse_url_amazon['host'] . $parse_url_amazon['path'] . '?' . $parameter_url_amazon, $new_content);  
         }
     }
+    write_log('$entro 4');
 
     return $new_content;
 }
