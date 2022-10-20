@@ -435,26 +435,19 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-        CURLOPT_URL => $old_link_content,
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10000,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'GET',
+            CURLOPT_URL => 'https://geni.us/5Vsa',
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_CUSTOMREQUEST => 'GET'
         ));
         
         
-        $html_amazon = curl_exec($curl);
+        // $html_amazon = curl_exec($curl);
         $info_amazon = curl_getinfo($curl);
-
+        
         curl_close($curl);
 
         write_log('$info_amazon');
         write_log($info_amazon);
-        write_log('$html_amazon');
-        write_log($html_amazon);
 
         $old_link_amazon = $info_amazon['url'];
 
