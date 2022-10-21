@@ -447,8 +447,8 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
         
         curl_close($curl);
         
-        print_r('$info_amazon');
-        print_r($info_amazon);
+        write_log('$info_amazon');
+        write_log($info_amazon);
 
         $old_link_amazon = $info_amazon['url'];
 
