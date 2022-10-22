@@ -372,8 +372,16 @@ function update_post_without_update_like($id_post = null){
                     $link_content,
                     false
                 );
-
+          
             }
+
+            $update_post = array(
+                'ID' => $get_post_without_update_like->ID,
+                'post_content' => wp_kses_post($new_content),
+            );
+    
+            wp_update_post($update_post, true);
+
         }
         // change url other
         foreach ($afi_change_urls as $key_afi_change_url => $afi_change_url) {     
@@ -394,37 +402,71 @@ function update_post_without_update_like($id_post = null){
                     $link_content,
                     true
                 );
+
+                if (
+                    defined('DOING_AJAX') 
+                    && DOING_AJAX
+                    && $key_link_content === 2
+                ){                    
+                        
+                    $return_ajax = json_encode ([
+                        'continue' => true,
+                        'nex_post' => false
+                    ]);
+                    echo $return_ajax;        
+                    wp_die();
+
+                }
+
+                $update_post = array(
+                    'ID' => $get_post_without_update_like->ID,
+                    'post_content' => wp_kses_post($new_content),
+                );
+        
+                wp_update_post($update_post, true);                
             }            
             
         }
 
 
-        $update_post = array(
-            'ID' => $get_post_without_update_like->ID,
-            'post_content' => wp_kses_post($new_content),
-        );
-
-
-
-
-        wp_update_post($update_post, true);
-
     }   
 	
     if (defined('DOING_AJAX') && DOING_AJAX){
         
+        $nex_post = false;
+
+        if(
+            empty($change_url_amazon[2])
+            && empty($change_url_other[2])
+        ){
+            $nex_post = true;
+        }
+
+
         $continue = !empty($get_posts_without_update_like) ? true : false;
 
         $return_ajax = json_encode ([
-            'continue' => $continue 
+            'continue' => $continue,
+            'nex_post' => $nex_post
         ]);
         echo $return_ajax;        
         wp_die();
     }
 }
 
+
+
+
+
+
+
+
+
+
+
 function ger_content_with_updata_url($new_content, $change_language, $old_link_content, $is_redirect = false){
 
+    $error_update_url = true;
 
     $afi_amazon_id = get_option('afi_amazon_id');
 
@@ -439,7 +481,6 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
     }
 
     if($is_redirect){
-        // sleep(2);
         
         $curl = curl_init();
 
@@ -462,6 +503,12 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
         write_log($info_amazon);
 
         $old_link_amazon = $info_amazon['url'];
+
+        if($old_link_amazon === $old_link_content){
+            sleep(10);
+
+            ger_content_with_updata_url($new_content, $change_language, $old_link_content, $is_redirect);
+        }
 
 
     }else{
