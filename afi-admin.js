@@ -1,7 +1,5 @@
 jQuery( function( $ ) {
 
-    header("Access-Control-Allow-Origin: *")
-
 	$(document.body).on('click','.afi-active-updata-config',function(e){
         e.preventDefault();
 
@@ -15,9 +13,7 @@ jQuery( function( $ ) {
         $.ajax({
             url : url_vars.ajax_url,
             type: 'post',
-            data: data_ajax,
-            crossDomain: true,
-            dataType: 'jsonp',            
+            data: data_ajax,            
             beforeSend: function(){
                 
                 $('.afi-info-updata-config').html('Guardando...');
