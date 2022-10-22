@@ -431,13 +431,15 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
         $url_resplase_amazon = 'https://www.amazon.com';
     }
 
-    sleep(2);
-
     if($is_redirect){
+        if (defined('DOING_AJAX') && DOING_AJAX){
+            sleep(2);
+        }
+
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
-            CURLOPT_URL => 'https://geni.us/r8Fm',
+            CURLOPT_URL => $old_link_content,
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_ENCODING => '',
             CURLOPT_FOLLOWLOCATION => true,
