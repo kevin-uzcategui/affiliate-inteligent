@@ -443,7 +443,7 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
     }
 
     if($is_redirect){
-        sleep(5);
+        sleep(2);
         
         $curl = curl_init();
 
