@@ -315,6 +315,8 @@ function update_post_without_update_like($id_post = null){
         $offset = absint($_POST['offset']);
         $limit = absint($_POST['limit']);
 
+        write_log($offset);
+
         $where_search = "`post_content` REGEXP '(https:\/\/|http:\/\/)(www\.)?amazon\.(.*?)\/(.*?)'";
 
         foreach ($afi_change_urls as $key_afi_change_url => $afi_change_url) {
@@ -336,6 +338,9 @@ function update_post_without_update_like($id_post = null){
 
 
     foreach ($get_posts_without_update_like as $get_post_without_update_like) {
+        write_log('$get_post_without_update_like->ID');
+        write_log($get_post_without_update_like->ID);
+
         // get data post
         $new_content = $get_post_without_update_like->post_content;
 
@@ -373,9 +378,6 @@ function update_post_without_update_like($id_post = null){
                 $change_url_other
             );
 
-            write_log('$change_url_other');
-            write_log($change_url_other);
-
             foreach ($change_url_other[2] as $key_link_content => $link_content) {
             
                 $new_content = ger_content_with_updata_url(
@@ -387,10 +389,7 @@ function update_post_without_update_like($id_post = null){
             }            
             
         }
-        write_log('$get_post_without_update_like->ID');
-        write_log($get_post_without_update_like->ID);
-        write_log('$new_content');
-        write_log($new_content);
+
 
         $update_post = array(
             'ID' => $get_post_without_update_like->ID,
@@ -431,13 +430,17 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
         $url_resplase_amazon = 'https://www.amazon.com';
     }
 
+    sleep(10);
+
     if($is_redirect){
         $curl = curl_init();
 
         curl_setopt_array($curl, array(
             CURLOPT_URL => 'https://geni.us/r8Fm',
             CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
             CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
             CURLOPT_CUSTOMREQUEST => 'GET',
         ));
         
@@ -458,8 +461,6 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
     }
 
     $parse_url_amazon = parse_url($old_link_amazon);
-    write_log('$old_link_content');
-    write_log($old_link_content);
 
     // change tag/id afiliate
 
@@ -469,8 +470,6 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
     $parameter_url_amazon['tag'] = $afi_amazon_id;
 
     if(!empty($parameter_url_amazon['keywords'])){
-        write_log('$search 1');
-
 
         $search_amazon = $parameter_url_amazon['keywords'];
     }else if(
@@ -480,7 +479,6 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
             $path_amazon_title
         )
     ){
-        write_log('$search 2');
 
         $search_amazon = str_replace('-', ' ', $path_amazon_title[4]);
 
@@ -496,9 +494,6 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
     ){
 
         if(!empty($search_amazon)){
-
-            write_log('$change 1');
-
 
             $parameter_resplase_amazon = array(
                 'k' => $search_amazon,
@@ -516,24 +511,18 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
                 $old_link_amazon
             )
         ){
-            write_log('$change 2');
 
             $parameter_url_amazon = http_build_query($parameter_url_amazon);
 
             $new_content = str_replace($old_link_content, $url_resplase_amazon . $parse_url_amazon['path'] . '?' . $parameter_url_amazon, $new_content);
     
         }else{
-            write_log('$change 3');
 
             $parameter_url_amazon = http_build_query($parameter_url_amazon);
 
             $new_content = str_replace($old_link_content, $parse_url_amazon['scheme'] . "://" . $parse_url_amazon['host'] . $parse_url_amazon['path'] . '?' . $parameter_url_amazon, $new_content);  
         }
     }
-
-    write_log('$new_content');
-    write_log($new_content);
-
 
     return $new_content;
 }
