@@ -431,7 +431,7 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
         $url_resplase_amazon = 'https://www.amazon.com';
     }
 
-    sleep(8);
+    sleep(2);
 
     if($is_redirect){
         $curl = curl_init();
