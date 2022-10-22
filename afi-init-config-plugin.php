@@ -409,6 +409,8 @@ function update_post_without_update_like($id_post = null){
                     && $key_link_content === 2
                 ){                    
                         
+                    write_log("entro pasa por paso");
+
                     $return_ajax = json_encode ([
                         'continue' => true,
                         'nex_post' => false

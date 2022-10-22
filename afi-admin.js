@@ -69,7 +69,7 @@ jQuery( function( $ ) {
 
 
 
-        
+
         var data_ajax = {
             action : 'ajax_update_post_without_update_like',
             offset : offset,
@@ -88,7 +88,11 @@ jQuery( function( $ ) {
             success: function(resultado){
                 var resultado = JSON.parse(resultado);
 
-                if(resultado.continue){
+                if(! resultado.nex_post){
+
+                    afi_form_link_update(offset)
+
+                }else if(resultado.continue){
                     number_success += 1;
                     console.log("entro");
 
