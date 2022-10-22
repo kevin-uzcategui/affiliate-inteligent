@@ -256,6 +256,13 @@ function amazon_like_update_html(){
             <label for="offset">Posición</label>
             <input value="<?php echo $afi_offset_form_link_update ?>" name="offset" id="offset" type="number">
         </div>
+        <div>
+            <label for="is-change-url-amazon-direct">Is change url amazon direct</label>
+            <input value="false" name="is_change_url_amazon_direct" id="is-change-url-amazon-direct" type="text">
+        </div>
+
+        
+        
         <button class="afi-active-link-update">Activar</button>
         <div class="afi-info-link-update"></div>
         <div class="afi-error-link-update"></div>
@@ -307,16 +314,15 @@ function update_post_without_update_like($id_post = null){
     $afi_change_urls = get_option('afi_change_urls', array());
 
     if(!empty($id_post)){
+        $is_change_url_amazon_direct = true;        
+
         $sql_posts_without_update_like = "SELECT ID, post_content FROM `{$wpdb->prefix}posts` WHERE ID = $id_post";
-
-
 
         $get_posts_without_update_like = $wpdb->get_results($sql_posts_without_update_like);
     }else{
         $offset = absint($_POST['offset']);
         $limit = absint($_POST['limit']);
-
-        write_log($offset);
+        $is_change_url_amazon_direct = $_POST['is_change_url_amazon_direct'];
 
         $where_search = "`post_content` REGEXP '(https:\/\/|http:\/\/)(www\.)?amazon\.(.*?)\/(.*?)'";
 
@@ -351,23 +357,28 @@ function update_post_without_update_like($id_post = null){
 
         // init update post without update like
         // change url amazon
-        preg_match_all ( 
-            '/<a(.|\n)*?href=[\"\']((https:\/\/|http:\/\/)(www\.)?amazon\.(.*?)\/(.*?))[\"\'](.|\n)*?<\/a>/', 
-            $new_content, 
-            $change_url_amazon
-        );
 
-        foreach ($change_url_amazon[2] as $key_link_content => $link_content) {
+        write_log('filter_var($is_change_url_amazon_direct, FILTER_VALIDATE_BOOLEAN)');
+        write_log($is_change_url_amazon_direct);
 
-            $new_content = ger_content_with_updata_url(
+        if(filter_var($is_change_url_amazon_direct, FILTER_VALIDATE_BOOLEAN)){
+            preg_match_all ( 
+                '/<a(.|\n)*?href=[\"\']((https:\/\/|http:\/\/)(www\.)?amazon\.(.*?)\/(.*?))[\"\'](.|\n)*?<\/a>/', 
                 $new_content, 
-                $post_language_info['lenguge_language'], 
-                $link_content,
-                false
+                $change_url_amazon
             );
 
-        }
+            foreach ($change_url_amazon[2] as $key_link_content => $link_content) {
 
+                $new_content = ger_content_with_updata_url(
+                    $new_content, 
+                    $post_language_info['lenguge_language'], 
+                    $link_content,
+                    false
+                );
+
+            }
+        }
         // change url other
         foreach ($afi_change_urls as $key_afi_change_url => $afi_change_url) {     
 
@@ -432,10 +443,8 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
     }
 
     if($is_redirect){
-        if (defined('DOING_AJAX') && DOING_AJAX){
-            sleep(2);
-        }
-
+        sleep(5);
+        
         $curl = curl_init();
 
         curl_setopt_array($curl, array(

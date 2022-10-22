@@ -70,7 +70,8 @@ jQuery( function( $ ) {
         var data_ajax = {
             action : 'ajax_update_post_without_update_like',
             offset : offset,
-            limit : 1
+            limit : 1,
+            is_change_url_amazon_direct : $('#is-change-url-amazon-direct').val()
         };
         
         
