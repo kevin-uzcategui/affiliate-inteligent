@@ -43,8 +43,12 @@ jQuery( function( $ ) {
 	$(document.body).on('click','.afi-active-link-update',function(e){
         e.preventDefault();
 
-        afi_form_link_update_list(Math.floor($('#offset').val()));
+        var offset = Math.floor($('#offset').val());
+
+        afi_form_link_update_list(offset);
         
+
+
 	});
 
     function afi_form_link_update_list(offset) {
@@ -85,7 +89,9 @@ jQuery( function( $ ) {
                     console.log("entro");
 
                     if(new_update === number_success){
-                        afi_form_link_update_list(number_success)
+                        offset += 1;
+
+                        afi_form_link_update_list(offset)
                     }
             
                     $('.afi-info-link-update').html(number_success);
