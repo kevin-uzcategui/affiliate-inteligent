@@ -98,7 +98,15 @@ jQuery( function( $ ) {
                 }
             },
             error: function (xhr, ajaxOptions, thrownError) {
-                $('.afi-info-link-update').html('Error');
+                $('.afi-error-link-update').html('Error');
+                console.log('xhr');
+                console.log(xhr);
+
+                console.log('ajaxOptions');
+                console.log(ajaxOptions);
+
+                console.log('thrownError');
+                console.log(thrownError);
             }
         });
     }

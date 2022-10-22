@@ -258,6 +258,7 @@ function amazon_like_update_html(){
         </div>
         <button class="afi-active-link-update">Activar</button>
         <div class="afi-info-link-update"></div>
+        <div class="afi-error-link-update"></div>
     </form>
     <?php
 }
