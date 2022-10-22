@@ -357,10 +357,6 @@ function update_post_without_update_like($id_post = null){
 
         // init update post without update like
         // change url amazon
-
-        write_log('filter_var($is_change_url_amazon_direct, FILTER_VALIDATE_BOOLEAN)');
-        write_log($is_change_url_amazon_direct);
-
         if(filter_var($is_change_url_amazon_direct, FILTER_VALIDATE_BOOLEAN)){
             preg_match_all ( 
                 '/<a(.|\n)*?href=[\"\']((https:\/\/|http:\/\/)(www\.)?amazon\.(.*?)\/(.*?))[\"\'](.|\n)*?<\/a>/', 
@@ -443,7 +439,7 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
     }
 
     if($is_redirect){
-        sleep(2);
+        // sleep(2);
         
         $curl = curl_init();
 
