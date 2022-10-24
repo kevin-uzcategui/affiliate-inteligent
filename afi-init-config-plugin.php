@@ -579,6 +579,8 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
 
             $new_content = str_replace($old_link_content, $parse_url_amazon['scheme'] . "://" . $parse_url_amazon['host'] . $parse_url_amazon['path'] . '?' . $parameter_url_amazon, $new_content);  
         }
+    }else{
+        $new_content = str_replace($old_link_content, $old_link_amazon, $new_content);
     }
 
     return $new_content;
