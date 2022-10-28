@@ -39,7 +39,7 @@ function ai_admin_enqueue() {
 add_action( 'admin_enqueue_scripts', 'ai_admin_enqueue');
 
 
-add_action( 'wp_head', "affidiate" );
+add_action( 'wp_footer', "affidiate" );
 
 function affidiate(){
     ?>
@@ -501,9 +501,6 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
         
         curl_close($curl);
         
-        write_log('$info_amazon');
-        write_log($info_amazon);
-
         $old_link_amazon = $info_amazon['url'];
 
         if($old_link_amazon === $old_link_content){
