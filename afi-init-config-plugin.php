@@ -192,7 +192,7 @@ function affidiate(){
 
             setTimeout(function () {
                 jQuery('body').append(`<script type=\"module\" src=\"https://epnt.ebay.com/static/epn-smart-tools.js\"><\/script>`);
-            }, 3000);
+            }, 7000);
 
 
         });
