@@ -44,7 +44,7 @@ add_action( 'wp_footer', "affidiate" );
 function affidiate(){
     ?>
         <script>window._epn = {campaign: 5338796121};</script>
-        
+        <script type="module" async src="https://epnt.ebay.com/static/epn-smart-tools.js"></script>
         <?php
 
             $print_product = "";
@@ -189,11 +189,6 @@ function affidiate(){
 
             var img_width = jQuery('.content-product__product-ing').innerWidth();
             jQuery('.content-product__product-ing').css('height', img_width);
-
-            setTimeout(function () {
-                jQuery('body').append(`<script type=\"module\" src=\"https://epnt.ebay.com/static/epn-smart-tools.js\"><\/script>`);
-            }, 7000);
-
 
         });
 
