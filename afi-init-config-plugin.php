@@ -43,8 +43,15 @@ add_action( 'wp_footer', "affidiate" );
 
 function affidiate(){
     ?>
-        <script>window._epn = {campaign: 5338796121};</script>
-        <script type="module" async src="https://epnt.ebay.com/static/epn-smart-tools.js"></script>
+        <script>
+            setTimeout(function () {
+                window._epn = {campaign: 5338796121};
+                jQuery("body").prepend('<script src="https://epnt.ebay.com/static/epn-smart-tools.js"><\/script>')                
+            }, 6000);
+
+        </script>
+
+
         <?php
 
             $print_product = "";
