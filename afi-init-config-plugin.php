@@ -44,16 +44,11 @@ add_action( 'wp_footer', "affidiate" );
 function affidiate(){
     ?>
         <script>
-            setTimeout(function () {
-                window._epn = {campaign: 5338796121};
-                jQuery("body").prepend('<script src="https://epnt.ebay.com/static/epn-smart-tools.js"><\/script>')                
-            }, 6000);
-
+            window._epn = {campaign: 5338796121};
         </script>
-
-
+        <script src="https://epnt.ebay.com/static/epn-smart-tools.js"></script>
         <?php
-
+            
             $print_product = "";
 
             if(pll_current_language('locale') === "es_ES"):
@@ -143,9 +138,9 @@ function affidiate(){
                     </div>                                                          
                 </div>';
             endif;
-
+            
         ?>
-        
+
         <style>
             .content-product{
                 display: flex;
