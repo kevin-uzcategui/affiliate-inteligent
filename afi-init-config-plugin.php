@@ -44,8 +44,8 @@ add_action( 'wp_footer', "affidiate" );
 function affidiate(){
 
         ?>
-            <script>window._epn = {campaign: 5338796121, smartPopover:false};</script>
-            <script src="https://epnt.ebay.com/static/epn-smart-tools.js"></script>
+            <!-- <script>window._epn = {campaign: 5338796121, smartPopover:false};</script>
+            <script src="https://epnt.ebay.com/static/epn-smart-tools.js"></script> -->
 
             <?php
 
@@ -229,6 +229,9 @@ function amazon_like_update_html(){
 
     $afi_amazon_id = get_option('afi_amazon_id');
 
+    $afi_ebay_id = get_option('afi_ebay_id');
+
+
     $afi_change_urls = get_option('afi_change_urls', array());
 
     $afi_offset_form_link_update = get_option('afi_offset_form_link_update', 0);
@@ -245,8 +248,12 @@ function amazon_like_update_html(){
             <input value="<?php echo $afi_amazon_id ?>" name="amazon_id" id="amazon-id" type="text">
         </div>
         <div>
-            <label for="change-url">URLs a cambiar</label>
-            <input value="<?php echo $afi_change_urls ?>" name="change_urls" id="change-urls" type="text">
+            <label for="ebay-id">Id Ebay</label>
+            <input value="<?php echo $afi_ebay_id ?>" name="ebay_id" id="ebay-id" type="text">
+        </div>        
+        <div>
+            <label for="change-url">URLs a cambiar amazon</label>
+            <input value="<?php echo $afi_change_urls_amazon ?>" name="change_urls_amazon" id="change-urls-amazon" type="text">
         </div>
         <button class="afi-active-updata-config">Actualizar</button>
         <div class="afi-info-updata-config"></div>
@@ -259,16 +266,15 @@ function amazon_like_update_html(){
             <input value="<?php echo $afi_offset_form_link_update ?>" name="offset" id="offset" type="number">
         </div>
         <div>
-            <label for="is-change-url-amazon-direct">Is change url amazon direct</label>
-            <input value="false" name="is_change_url_amazon_direct" id="is-change-url-amazon-direct" type="text">
-        </div>
-
+            <label for="is-change-url-direct">Is change url direct</label>
+            <input value="true" name="is_change_url_direct" id="is-change-url-direct" type="text">
+        </div>   
         
-        
-        <button class="afi-active-link-update">Activar</button>
+        <button class="afi-active-link-update">Activar Amazon</button>
+        <button class="afi-active-link-update-ebay">Activar Ebay</button>
         <div class="afi-info-link-update"></div>
         <div class="afi-error-link-update"></div>
-    </form>
+    </form>   
     <?php
 }
 
@@ -279,7 +285,6 @@ function set_offset_form_link(){
 
     /* offset form link update */
     $offset_form_link_update = $_POST['update_offset'];
-
     update_option('afi_offset_form_link_update', $offset_form_link_update);
 
 }
@@ -294,12 +299,17 @@ function amazon_like_update_date_save(){
 
     update_option('afi_amazon_id', $amazon_id);
 
+    /* ebay id */
+    $ebay_id = stripslashes($_POST['ebay_id']);
+
+    update_option('afi_ebay_id', $ebay_id);    
+
     /* change urls */
-    $change_urls = stripslashes($_POST['change_urls']);
+    $change_urls_amazon = stripslashes($_POST['change_urls_amazon']);
 
-    $array_change_urls = explode(',', $change_urls);
+    $array_change_urls_amazon = explode(',', $change_urls_amazon);
 
-    update_option('afi_change_urls', $array_change_urls);
+    update_option('afi_amazon_change_urls', $array_change_urls_amazon);
 
 }
 
@@ -307,16 +317,14 @@ function amazon_like_update_date_save(){
 add_action('wp_ajax_nopriv_ajax_update_post_without_update_like','update_post_without_update_like'); // permitre que funcion para usurios registrados
 add_action('wp_ajax_ajax_update_post_without_update_like','update_post_without_update_like'); 
 
-function update_post_without_update_like($id_post = null){    
+function update_post_without_update_like($id_post = null, $update_type = ""){    
     global $wpdb;
 
-    write_log('----------------update_post_without_update_like-----------------');
-
-
-    $afi_change_urls = get_option('afi_change_urls', array());
+    $afi_amazon_change_urls = get_option('afi_amazon_change_urls', array());
 
     if(!empty($id_post)){
-        $is_change_url_amazon_direct = true;        
+
+        $is_change_url_direct = true;        
 
         $sql_posts_without_update_like = "SELECT ID, post_content FROM `{$wpdb->prefix}posts` WHERE ID = $id_post";
 
@@ -324,59 +332,87 @@ function update_post_without_update_like($id_post = null){
     }else{
         $offset = absint($_POST['offset']);
         $limit = absint($_POST['limit']);
-        $is_change_url_amazon_direct = $_POST['is_change_url_amazon_direct'];
+        $is_change_url_direct = $_POST['is_change_url_direct'];
+        $update_type = $_POST['update_type'];
 
-        $where_search = "`post_content` REGEXP '(https:\/\/|http:\/\/)(www\.)?amazon\.(.*?)\/(.*?)'";
+        if($update_type === 'amazon'){
+            // get post with like amazon
+            $where_search = "`post_content` REGEXP '(https:\/\/|http:\/\/)(www\.)?amazon\.(.*?)\/(.*?)'";
 
-        foreach ($afi_change_urls as $key_afi_change_url => $afi_change_url) {
-            
-            $afi_change_url = str_replace('\'', '\\\'', $afi_change_url);
-
-            $where_search .= " OR `post_content` LIKE '%$afi_change_url%'";
-
+            foreach ($afi_amazon_change_urls as $key_afi_change_url => $afi_change_url) {
+                
+                $afi_change_url = str_replace('\'', '\\\'', $afi_change_url);
+    
+                $where_search .= " OR `post_content` LIKE '%$afi_change_url%'";
+    
+            }
+                    
+            $sql_posts_without_update_like = "SELECT ID, post_content FROM `{$wpdb->prefix}posts` WHERE ($where_search) AND `post_status` LIKE 'publish' LIMIT $limit OFFSET $offset";
+    
+            $get_posts_without_update_like = $wpdb->get_results($sql_posts_without_update_like);            
+        }elseif($update_type === 'ebay'){
+            // get post with like ebay
+            $where_search = "`post_content` REGEXP '(https:\/\/|http:\/\/)(www\.)?ebay\.(.*?)\/(.*?)'";
+                    
+            $sql_posts_without_update_like = "SELECT ID, post_content FROM `{$wpdb->prefix}posts` WHERE ($where_search) AND `post_status` LIKE 'publish' LIMIT $limit OFFSET $offset";
+    
+            $get_posts_without_update_like = $wpdb->get_results($sql_posts_without_update_like);        
         }
-        
-        // get post without update like
-        $sql_posts_without_update_like = "SELECT ID, post_content FROM `{$wpdb->prefix}posts` WHERE ($where_search) AND `post_status` LIKE 'publish' LIMIT $limit OFFSET $offset";
 
-
-        $get_posts_without_update_like = $wpdb->get_results($sql_posts_without_update_like);
 
     }
 
 
 
     foreach ($get_posts_without_update_like as $get_post_without_update_like) {
-        write_log('$get_post_without_update_like->ID');
-        write_log($get_post_without_update_like->ID);
-
         // get data post
         $new_content = $get_post_without_update_like->post_content;
+
+        $web_import_language = get_post_meta( $get_post_without_update_like->ID, 'web_import_language' )[0];
 
         $post_slug_language = pll_get_post_language( $get_post_without_update_like->ID );
 
         $post_language_info = get_info_by_slug($post_slug_language);
 
         // init update post without update like
-        // change url amazon
-        if(filter_var($is_change_url_amazon_direct, FILTER_VALIDATE_BOOLEAN)){
-            preg_match_all ( 
-                '/<a(.|\n)*?href=[\"\']((https:\/\/|http:\/\/)(www\.)?amazon\.(.*?)\/(.*?))[\"\'](.|\n)*?<\/a>/', 
-                $new_content, 
-                $change_url_amazon
-            );
+        // change url amazon/ebay
+        if(filter_var($is_change_url_direct, FILTER_VALIDATE_BOOLEAN)){
 
-            foreach ($change_url_amazon[2] as $key_link_content => $link_content) {
-
-                $new_content = ger_content_with_updata_url(
+            if($update_type === 'amazon'){
+                preg_match_all ( 
+                    '/<a(.|\n)*?href=[\"\']((https:\/\/|http:\/\/)(www\.)?amazon\.(.*?)\/(.*?))[\"\'](.|\n)*?<\/a>/', 
                     $new_content, 
-                    $post_language_info['lenguge_language'], 
-                    $link_content,
-                    false
+                    $change_url
                 );
-          
-            }
+            
+                foreach ($change_url[2] as $key_link_content => $link_content) {
 
+                    $new_content = ger_content_with_updata_url_amazon(
+                        $new_content, 
+                        $post_language_info['lenguge_language'], 
+                        $link_content,
+                        $web_import_language,
+                        false
+                    );
+              
+                }
+
+            }elseif($update_type === 'ebay'){
+                preg_match_all ( 
+                    '/<a(.|\n)*?href=[\"\']((https:\/\/|http:\/\/)(www\.)?ebay\.(.*?)\/(.*?))[\"\'](.|\n)*?<\/a>/', 
+                    $new_content, 
+                    $change_url
+                );
+
+                foreach ($change_url[2] as $key_link_content => $link_content) {
+
+                    $new_content = ger_content_with_updata_url_ebay(
+                        $new_content, 
+                        $link_content
+                    );
+              
+                }                
+            }
             $update_post = array(
                 'ID' => $get_post_without_update_like->ID,
                 'post_content' => wp_kses_post($new_content),
@@ -386,61 +422,66 @@ function update_post_without_update_like($id_post = null){
 
         }
         // change url other
-        foreach ($afi_change_urls as $key_afi_change_url => $afi_change_url) {     
+        if($update_type === 'amazon'){
+            foreach ($afi_amazon_change_urls as $key_afi_change_url => $afi_change_url) {     
 
-            $afi_change_url_regex = preg_quote($afi_change_url, '/');
+                $afi_change_url_regex = preg_quote($afi_change_url, '/');
 
-            preg_match_all ( 
-                '/<a(.|\n)*?href=[\"\']((https:\/\/|http:\/\/)(www\.)?' . $afi_change_url_regex . '\/(.*?))[\"\'](.|\n)*?<\/a>/', 
-                $new_content,
-                $change_url_other
-            );
-
-            foreach ($change_url_other[2] as $key_link_content => $link_content) {
-            
-                $new_content = ger_content_with_updata_url(
-                    $new_content, 
-                    $post_language_info['lenguge_language'], 
-                    $link_content,
-                    true
+                preg_match_all ( 
+                    '/<a(.|\n)*?href=[\"\']((https:\/\/|http:\/\/)(www\.)?' . $afi_change_url_regex . '\/(.*?))[\"\'](.|\n)*?<\/a>/', 
+                    $new_content,
+                    $change_url_other
                 );
 
-                if (
-                    defined('DOING_AJAX') 
-                    && DOING_AJAX
-                    && $key_link_content === 2
-                ){                    
-                        
-                    write_log("entro pasa por paso");
+                foreach ($change_url_other[2] as $key_link_content => $link_content) {
 
-                    $return_ajax = json_encode ([
-                        'continue' => true,
-                        'nex_post' => false
-                    ]);
-                    echo $return_ajax;        
-                    wp_die();
+                    $new_content = ger_content_with_updata_url_amazon(
+                        $new_content, 
+                        $post_language_info['lenguge_language'], 
+                        $link_content,
+                        $web_import_language,
+                        true
+                    );
 
-                }
+                    if (
+                        defined('DOING_AJAX') 
+                        && DOING_AJAX
+                        && $key_link_content === 2
+                    ){                    
+                            
+                        $return_ajax = json_encode ([
+                            'continue' => true,
+                            'nex_post' => false
+                        ]);
+                        echo $return_ajax;        
+                        wp_die();
 
-                $update_post = array(
-                    'ID' => $get_post_without_update_like->ID,
-                    'post_content' => wp_kses_post($new_content),
-                );
-        
-                wp_update_post($update_post, true);                
-            }            
-            
+                    }
+
+    
+
+                }            
+                
+            }
         }
 
-
     }   
-	
+
+    // update post
+    $update_post = array(
+        'ID' => $get_post_without_update_like->ID,
+        'post_content' => wp_kses_post($new_content),
+    );
+
+    wp_update_post($update_post, true);  
+
+    // return ajax
     if (defined('DOING_AJAX') && DOING_AJAX){
         
         $nex_post = false;
 
         if(
-            empty($change_url_amazon[2])
+            empty($change_url[2])
             && empty($change_url_other[2])
         ){
             $nex_post = true;
@@ -458,17 +499,7 @@ function update_post_without_update_like($id_post = null){
     }
 }
 
-
-
-
-
-
-
-
-
-
-
-function ger_content_with_updata_url($new_content, $change_language, $old_link_content, $is_redirect = false){
+function ger_content_with_updata_url_amazon($new_content, $change_language, $old_link_content, $web_import_language, $is_redirect = false){
 
     $error_update_url = true;
 
@@ -508,7 +539,7 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
         if($old_link_amazon === $old_link_content){
             sleep(10);
 
-            ger_content_with_updata_url($new_content, $change_language, $old_link_content, $is_redirect);
+            ger_content_with_updata_url_amazon($new_content, $change_language, $old_link_content, $web_import_language, $is_redirect);
         }
 
 
@@ -523,25 +554,31 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
     if(!empty($parse_url_amazon['query'])){
         parse_str(html_entity_decode($parse_url_amazon['query']), $parameter_url_amazon);
     }
+  
     $parameter_url_amazon['tag'] = $afi_amazon_id;
 
-    if(!empty($parameter_url_amazon['keywords'])){
-
-        $search_amazon = $parameter_url_amazon['keywords'];
-    }else if(
+    // change keywords
+    if(
         preg_match( 
             '/^(https:\/\/|http:\/\/)(www\.)?amazon\.(.[^\/]*?)\/(.[^\/]*)\/dp[\/|?]/', 
             $old_link_amazon, 
             $path_amazon_title
-        )
+        ) && empty($parameter_url_amazon['keywords'])
     ){
 
-        $search_amazon = str_replace('-', ' ', $path_amazon_title[4]);
+        $parameter_url_amazon['keywords'] = str_replace('-', ' ', urldecode($path_amazon_title[4]));
 
+    }elseif(!empty($parameter_url_amazon['k'])){
+        $parameter_url_amazon['keywords'] = $parameter_url_amazon['k'];
+    }
+    
+    if(is_plugin_active('importe-automatico/init-config-plugin.php')){
+        $parameter_url_amazon['keywords'] = text_of_translate($parameter_url_amazon['keywords'], $web_import_language, $change_language);    
     }
 
-
-
+    write_log('$parameter_url_amazon[keywords]');
+    write_log($parameter_url_amazon['keywords']);
+    // change url
     if(   
         preg_match ( 
             '/^(https:\/\/|http:\/\/)(www\.)?amazon\.(.*?)\/(.*?)$/', 
@@ -549,10 +586,10 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
         )
     ){
 
-        if(!empty($search_amazon)){
+        if(!empty($parameter_url_amazon['keywords'])){
 
             $parameter_resplase_amazon = array(
-                'k' => $search_amazon,
+                'k' => $parameter_url_amazon['keywords'],
                 'tag' => $afi_amazon_id
             );
 
@@ -583,4 +620,56 @@ function ger_content_with_updata_url($new_content, $change_language, $old_link_c
     }
 
     return $new_content;
+}
+
+
+function ger_content_with_updata_url_ebay($new_content, $old_link_content){
+
+    $afi_ebay_id = get_option('afi_ebay_id');
+
+    $curl = curl_init();
+
+    curl_setopt_array($curl, array(
+        CURLOPT_URL => $old_link_content,
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'GET',
+    ));
+    
+    
+    curl_exec($curl);
+    $info_ebay = curl_getinfo($curl);
+
+    curl_close($curl);
+
+    $parse_url_ebay = parse_url(htmlspecialchars_decode($info_ebay['url']));
+
+    if(isset($parse_url_ebay['query'])){
+
+        parse_str($parse_url_ebay['query'], $params);
+
+        if(isset($params['campid'])){
+    
+            $new_query = preg_replace(
+                '/^(.*?)campid=\d*(.*?)$/', 
+                '$1campid=' .$afi_ebay_id . '$2', 
+                $parse_url_ebay['query'], 
+                -1
+            );           
+
+            $url_with_new_id = 'https://' . $parse_url_ebay['host'] . $parse_url_ebay['path'] .'?' . $new_query;
+    
+        }else{
+            $url_with_new_id = $info_ebay['url'] . "&campid=" . $afi_ebay_id;
+        }
+    }else{
+        $url_with_new_id = 'https://' . $parse_url_ebay['host'] . $parse_url_ebay['path'] . "?campid=" . $afi_ebay_id;
+    }
+
+    $new_content = str_replace("\"$old_link_content\"", $url_with_new_id, $new_content);
+
+    return $new_content;
+
 }

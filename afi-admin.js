@@ -39,17 +39,29 @@ jQuery( function( $ ) {
     var new_update = 0;
     var number_success = 0;
     var is_form_update_offset = false;
-
+    var update_type = "";
+    
 	$(document.body).on('click','.afi-active-link-update',function(e){
         e.preventDefault();
+
+        update_type = 'amazon';
 
         var offset = Math.floor($('#offset').val());
 
         afi_form_link_update_list(offset);
-        
-
 
 	});
+
+	$(document.body).on('click','.afi-active-link-update-ebay',function(e){
+        e.preventDefault();
+
+        update_type = 'ebay';
+
+        var offset = Math.floor($('#offset').val());
+
+        afi_form_link_update_list(offset);
+
+	});    
 
     function afi_form_link_update_list(offset) {
 
@@ -67,17 +79,14 @@ jQuery( function( $ ) {
 
     async function afi_form_link_update(offset){
 
-
-
-
         var data_ajax = {
             action : 'ajax_update_post_without_update_like',
             offset : offset,
             limit : 1,
-            is_change_url_amazon_direct : $('#is-change-url-amazon-direct').val()
+            is_change_url_direct : $('#is-change-url-direct').val(),
+            update_type : update_type
         };
-        
-        
+         
         $.ajax({
             url : url_vars.ajax_url,
             type: 'post',
@@ -94,7 +103,6 @@ jQuery( function( $ ) {
 
                 }else if(resultado.continue){
                     number_success += 1;
-                    console.log("entro");
 
                     if(new_update === number_success){
                         offset += 1;
@@ -126,7 +134,6 @@ jQuery( function( $ ) {
     }
 
     function offset_form_link_update(){
-
         var data_ajax = {
             action : 'ajax_set_offset_form_link',
             update_offset : number_success
@@ -150,6 +157,5 @@ jQuery( function( $ ) {
         });
     }
     
-
 } );
 
